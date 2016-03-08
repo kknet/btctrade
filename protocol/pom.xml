@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>btctrade.protocol</groupId>
+  <artifactId>btctrade-protocol</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0</version>
+  <name>btctrade-protocol</name>
+  <url>http://maven.apache.org</url>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.8</version>
+        <executions>
+          <execution>
+            <id>compile-protoc</id>
+            <phase>generate-sources</phase>
+            <configuration>
+              <target>
+                <echo message="Compiling Protos" />
+                <path id="proto.path">
+                  <fileset dir="src">
+                    <include name="**/*.proto" />
+                  </fileset>
+                </path>
+                <pathconvert pathsep=" " property="proto.files" refid="proto.path" />
+                <exec executable="protoc" failonerror="true">
+                  <arg value="--java_out=${project.basedir}/src/main/java" />
+                  <arg value="-I=${project.basedir}/src" />
+                  <arg line="${proto.files}" />
+                </exec>
+                <echo message="Protos Compiled" />
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+    </dependency>
+    <!-- google protocol buffer -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.0.0-beta-2</version>
+    </dependency>
+    <!-- Logging -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${org.slf4j-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${org.slf4j-version}</version>
+      <scope>runtime</scope>
+    </dependency>
+    <!-- active mq -->
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-all</artifactId>
+      <version>${activemq-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.activemq</groupId>
+      <artifactId>activemq-pool</artifactId>
+      <version>${activemq-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.bitcoinj</groupId>
+      <artifactId>bitcoinj-core</artifactId>
+      <version>0.13.5</version>
+    </dependency>
+  </dependencies>
+  <properties>
+    <org.slf4j-version>1.7.18</org.slf4j-version>
+    <activemq-version>5.13.1</activemq-version>
+  </properties>
+</project>

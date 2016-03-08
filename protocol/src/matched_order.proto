@@ -1,0 +1,27 @@
+package protodata;
+
+import "trade_order.proto";
+
+option java_package = "btctrade.jms.data";
+option java_outer_classname = "MatchedOrderProtos";
+
+message MatchedOrder {
+
+	enum MatchedOrderType {
+		CANCELED = 0;
+		FULL_FILLED = 1;
+	}
+	
+	required MatchedOrderType orderType = 1;
+	
+	// canceled
+	optional Order orderToCancel = 2;
+	
+	// fullfilled
+    optional Order buyOrder = 3;
+    optional Order sellOrder = 4;
+    optional bytes price = 5;
+    optional bytes volume = 6;
+    
+    required uint64 timestamp = 7;
+}

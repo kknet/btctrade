@@ -1,0 +1,22 @@
+package protodata;
+
+option java_package = "btctrade.jms.data";
+option java_outer_classname = "OrderProtos";
+
+message Order {
+    required uint64 orderId = 1;
+    required uint64 userID = 2;
+	
+	required bytes price = 3;
+	required bytes volume = 4;
+	
+	enum OrderType {
+		CANCEL_ORDER = 0;
+		BUY_ORDER = 1;
+		SELL_ORDER = 2;
+	}
+
+	required OrderType orderType = 5;
+	
+	required uint64 timestamp = 6;
+}

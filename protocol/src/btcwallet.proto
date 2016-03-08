@@ -1,0 +1,34 @@
+package protodata;
+
+option java_package = "btctrade.jms.data";
+option java_outer_classname = "BtcWalletProtos";
+
+message BtcWallet {
+	enum Type {
+		
+		REQUEST_CREATEADDRESS = 0;
+		REQUEST_QUERYBALANCE = 1;
+		
+		NOTIFY_ADDRESS_CREATED = 2;
+		NOTIFY_DEPOSIT_REQUEST = 3;
+		NOTIFY_DEPOSIT_CONFIRMED = 4;
+	}
+	
+	enum ResponseResult {
+		SUCCESS = 0;
+		FAIL = 1;
+	}
+	
+    required Type type = 1;
+    optional ResponseResult result = 2;
+    
+    required uint64 accountId = 3;
+    
+    optional bytes volume = 4;
+    optional string transactionID = 5;
+    optional int32 outputIndex = 6;
+    
+    optional string address = 7;
+
+	required uint64 timestamp = 8;
+}

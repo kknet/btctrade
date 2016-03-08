@@ -1,0 +1,26 @@
+package protodata;
+
+import "trade_order.proto";
+
+option java_package = "btctrade.jms.data";
+option java_outer_classname = "TradeStatisticProtos";
+
+message TradeStatistic {
+	
+	enum TradeStatisticType {
+		UPDATE_PRICE_VOLUME = 0;
+		UPDATE_BID_POSITION_ENQUEUE = 1;
+		UPDATE_BID_POSITION_DEQUEUE = 2;
+		UPDATE_ASK_POSITION_ENQUEUE = 3;
+		UPDATE_ASK_POSITION_DEQUEUE = 4;
+	}
+
+	required TradeStatisticType tradeStatisticType = 1;
+	
+	optional bytes price = 2;
+	optional bytes volume = 3;
+	
+    optional Order order = 4;
+    
+	required uint64 timestamp = 5;
+}
