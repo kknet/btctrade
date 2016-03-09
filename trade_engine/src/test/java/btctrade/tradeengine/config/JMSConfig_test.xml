@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<context:annotation-config base-package="btctrade.tradeengine" />
+
+	<!-- A JMS connection Factory for ActiveMQ -->
+	<bean class="org.apache.activemq.ActiveMQConnectionFactory" id="connectionFactory_test">
+		<property name="brokerURL" value="${mq.brokerurl}" />
+		<property name="userName" value="${mq.username}" />
+		<property name="password" value="${mq.password}" />
+	</bean>
+
+	<!-- JMS transaction manager -->
+	<bean id="transactionManager_test"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="connectionFactory_test"></property>
+	</bean>
+
+	<!-- Order Request Message Queue and Listener -->
+	<bean class="org.apache.activemq.command.ActiveMQQueue" id="order_request_queue_test">
+		<constructor-arg value="${request_order_queue.name}"></constructor-arg>
+	</bean>
+	<bean id="orderRequestMQTemplate_test" class="org.springframework.jms.core.JmsTemplate">
+		<constructor-arg ref="connectionFactory_test" />
+		<property name="sessionTransacted" value="false" />
+		<property name="defaultDestination" ref="order_request_queue_test" />
+	</bean>
+
+	<!-- Matched Order MQ template for send back fullfilled orders -->
+	<bean class="org.apache.activemq.command.ActiveMQQueue" id="matched_order_queue_test">
+		<constructor-arg value="${matched_order_queue.name}"></constructor-arg>
+	</bean>
+	<bean class="btctrade.tradeengine.jms.MatchedOrderListener" id="jmsMatchedOrderMessageListener_test" />
+	<bean
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+		id="jmsContainer1">
+		<property name="connectionFactory" ref="connectionFactory_test"></property>
+		<property name="destination" ref="matched_order_queue_test"></property>
+		<property name="messageListener" ref="jmsMatchedOrderMessageListener_test"></property>
+	</bean>
+</beans>

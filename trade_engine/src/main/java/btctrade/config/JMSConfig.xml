@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jms="http://www.springframework.org/schema/jms"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/jms http://www.springframework.org/schema/jms/spring-jms-3.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<!-- A JMS connection Factory for ActiveMQ -->
+	<bean class="org.apache.activemq.ActiveMQConnectionFactory" id="connectionFactory">
+		<property name="brokerURL" value="${mq.brokerurl}" />
+		<property name="userName" value="${mq.username}" />
+		<property name="password" value="${mq.password}" />
+	</bean>
+
+	<!-- JMS transaction manager -->
+	<bean id="transactionManager"
+		class="org.springframework.jms.connection.JmsTransactionManager">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+	</bean>
+
+	<!-- Order Request Message Queue and Listener -->
+	<bean class="org.apache.activemq.command.ActiveMQQueue" id="order_request_queue">
+		<constructor-arg value="${request_order_queue.name}"></constructor-arg>
+	</bean>
+	<bean class="btctrade.jms.service.OrderRequestListener" id="orderRequestMessageListener" />
+	<bean
+		class="org.springframework.jms.listener.DefaultMessageListenerContainer"
+		id="jmsContainer1">
+		<property name="connectionFactory" ref="connectionFactory"></property>
+		<property name="destination" ref="order_request_queue"></property>
+		<property name="messageListener" ref="orderRequestMessageListener"></property>
+	</bean>
+
+	<!-- Matched Order MQ template for send back fullfilled orders -->
+	<bean class="org.apache.activemq.command.ActiveMQQueue" id="matched_order_queue">
+		<constructor-arg value="${matched_order_queue.name}"></constructor-arg>
+	</bean>
+	<bean id="jmsMatchedOrderMQTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<constructor-arg ref="connectionFactory" />
+		<property name="sessionTransacted" value="false" />
+		<property name="defaultDestination" ref="matched_order_queue" />
+	</bean>
+
+	<!-- PubSub topic -->
+	<bean class="org.apache.activemq.command.ActiveMQTopic" id="trade_statistics_topic">
+		<constructor-arg value="${trade_statistic_topic.name}"></constructor-arg>
+	</bean>
+	<bean id="tradeStatisticsTopicTemplate" class="org.springframework.jms.core.JmsTemplate">
+		<constructor-arg ref="connectionFactory" />
+		<property name="sessionTransacted" value="false" />
+		<property name="defaultDestination" ref="trade_statistics_topic" />
+	</bean>
+
+</beans>

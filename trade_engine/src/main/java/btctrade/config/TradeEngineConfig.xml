@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd">
+
+	<context:annotation-config base-package="btctrade.tradeengine" />
+
+	<bean id="buyOrderBlockingQueue" class="java.util.concurrent.LinkedBlockingQueue" />
+	<bean id="sellOrderBlockingQueue" class="java.util.concurrent.LinkedBlockingQueue" />
+	<bean id="cancelOrderBlockingQueue" class="java.util.concurrent.LinkedBlockingQueue" />
+
+	<bean id="buyOrderPool" class="java.util.PriorityQueue">
+		<constructor-arg index="0" value="10" />
+		<constructor-arg index="1">
+			<bean class="btctrade.tradeengine.BuyOrderPoolComparator"></bean>
+		</constructor-arg>
+	</bean>
+	<bean id="sellOrderPool" class="java.util.PriorityQueue">
+		<constructor-arg index="0" value="10" />
+		<constructor-arg index="1">
+			<bean class="btctrade.tradeengine.SellOrderPoolComparator"></bean>
+		</constructor-arg>
+	</bean>
+
+	<bean id="orderPools" class="java.util.LinkedList">
+		<constructor-arg>
+			<list value-type="java.util.PriorityQueue">
+				<ref bean="buyOrderPool" />
+				<ref bean="sellOrderPool" />
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean class="btctrade.tradeengine.service.CDAService" />
+	<bean class="btctrade.jms.service.TradeStatisticsPublisher" />
+
+	<context:property-placeholder location="classpath:trade_engine.properties" />
+</beans>
